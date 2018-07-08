@@ -37,7 +37,7 @@ public class PersistenceJPAConfig {
 	public DataSource dataSource() {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName("org.h2.Driver");
-		dataSource.setUrl("jdbc:h2:tcp://localhost/~/jbpm-db;MVCC=TRUE");
+		dataSource.setUrl("jdbc:h2:tcp://localhost/~/test");
 		dataSource.setUsername("sa");
 		dataSource.setPassword("");
 		return dataSource;

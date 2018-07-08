@@ -34,43 +34,37 @@ public class FriendController implements Serializable {
 
 	@GetMapping
 	public ResponseEntity<?> getAllFriends() {
-		// final List<Friend> listAllFriends = this.friendDao.listAllFriends();
-
 		final List<Friend> listAllFriends = this.friendDao.findAll();
 		return new ResponseEntity<>(listAllFriends, HttpStatus.OK);
 	}
 
 	@GetMapping(path = "{id}")
 	public ResponseEntity<?> getFriendById(@PathVariable("id") final Long id) {
-		// final Friend friend = this.friendDao.findFriendById(id);
-
 		final Friend friend = this.friendDao.findById(id);
 		return new ResponseEntity<>(friend, HttpStatus.OK);
 	}
 
 	@PostMapping
 	public ResponseEntity<?> insertFriend(@RequestBody final Friend friend) {
-		// return new ResponseEntity<>(this.friendDao.insertFriend(friend),
-		// HttpStatus.CREATED);
 		return new ResponseEntity<>(this.friendDao.save(friend), HttpStatus.CREATED);
 	}
 
 	@PutMapping
 	public ResponseEntity<?> updateFriend(@RequestBody final Friend friend) {
-		// this.friendDao.findFriendById(friend.getId());
-		// return new ResponseEntity<>(this.friendDao.updateFriend(friend),
-		// HttpStatus.OK);
-		//
-		this.friendDao.findById(friend.getId());
+		final Friend oldFriend = this.friendDao.findById(friend.getId());
+
+		if (oldFriend == null) {
+			throw new RuntimeException("Friend not found: " + friend);
+		}
+
+		friend.setId(oldFriend.getId());
+
 		return new ResponseEntity<>(this.friendDao.update(friend), HttpStatus.OK);
 	}
 
 	@DeleteMapping(path = "{id}")
 	public ResponseEntity<?> deleteFriend(@PathVariable("id") final Long id) {
-		// this.friendDao.findFriendById(id);
-		// this.friendDao.deleteFriend(id);
-
-		Friend entity = this.friendDao.findById(id);
+		final Friend entity = this.friendDao.findById(id);
 		this.friendDao.delete(entity);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}

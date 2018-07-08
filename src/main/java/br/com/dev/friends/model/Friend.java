@@ -10,18 +10,23 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
+@NamedQueries({ @NamedQuery(name = Friend.NQ_FIND_ALL, query = "select f from Friend f order by f.name"), })
 public class Friend implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 132809330764351265L;
+
+	public static final String NQ_FIND_ALL = "findAll";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +36,7 @@ public class Friend implements Serializable {
 	private String name;
 
 	private int age;
-	
+
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "friend", fetch = FetchType.EAGER)
 	@JsonIgnoreProperties("friend")
 	private List<Address> addresses = new ArrayList<>();

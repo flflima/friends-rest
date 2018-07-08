@@ -22,7 +22,7 @@ public abstract class BaseDAOImpl<T> implements BaseDAO<T> {
 	@Override
 	@Transactional
 	public void delete(T entity) {
-		this.entityManager.remove(entity);
+		this.entityManager.remove(this.entityManager.contains(entity) ? entity : this.entityManager.merge(entity));
 	}
 
 	@Override
