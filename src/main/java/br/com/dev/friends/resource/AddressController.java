@@ -32,31 +32,40 @@ public class AddressController implements Serializable {
 
 	@GetMapping
 	public ResponseEntity<?> getAllAddresses() {
-		final List<Address> listAllAddresses = this.addressDao.listAllAddresses();
+		// final List<Address> listAllAddresses = this.addressDao.listAllAddresses();
+		final List<Address> listAllAddresses = this.addressDao.findAll();
 		return new ResponseEntity<>(listAllAddresses, HttpStatus.OK);
 	}
 
 	@GetMapping(path = "{id}")
 	public ResponseEntity<?> getAddressById(@PathVariable("id") final Long id) {
-		final Address address = this.addressDao.findAddressById(id);
+		// final Address address = this.addressDao.findAddressById(id);
+		final Address address = this.addressDao.findById(id);
 		return new ResponseEntity<>(address, HttpStatus.OK);
 	}
 
 	@PostMapping
 	public ResponseEntity<?> insertAddress(@RequestBody final Address address) {
-		return new ResponseEntity<>(this.addressDao.insertAddress(address), HttpStatus.CREATED);
+		// return new ResponseEntity<>(this.addressDao.insertAddress(address),
+		// HttpStatus.CREATED);
+		return new ResponseEntity<>(this.addressDao.save(address), HttpStatus.CREATED);
 	}
 
 	@PutMapping
 	public ResponseEntity<?> updateAddress(@RequestBody Address address) {
-		this.addressDao.findAddressById(address.getId());
-		return new ResponseEntity<>(this.addressDao.updateAddress(address), HttpStatus.OK);
+		// this.addressDao.findAddressById(address.getId());
+		// return new ResponseEntity<>(this.addressDao.updateAddress(address),
+		// HttpStatus.OK);
+		this.addressDao.findById(address.getId());
+		return new ResponseEntity<>(this.addressDao.update(address), HttpStatus.OK);
 	}
 
 	@DeleteMapping(path = "{id}")
 	public ResponseEntity<?> deleteAddress(@PathVariable("id") final Long id) {
-		this.addressDao.findAddressById(id);
-		this.addressDao.deleteAddress(id);
+		Address entity = this.addressDao.findById(id);
+		this.addressDao.delete(entity);
+		// this.addressDao.findAddressById(id);
+		// this.addressDao.deleteAddress(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.dev.friends.dao.FriendDao;
 import br.com.dev.friends.model.Friend;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("friends")
 public class FriendController implements Serializable {
@@ -32,31 +34,44 @@ public class FriendController implements Serializable {
 
 	@GetMapping
 	public ResponseEntity<?> getAllFriends() {
-		final List<Friend> listAllFriends = this.friendDao.listAllFriends();
+		// final List<Friend> listAllFriends = this.friendDao.listAllFriends();
+
+		final List<Friend> listAllFriends = this.friendDao.findAll();
 		return new ResponseEntity<>(listAllFriends, HttpStatus.OK);
 	}
 
 	@GetMapping(path = "{id}")
 	public ResponseEntity<?> getFriendById(@PathVariable("id") final Long id) {
-		final Friend friend = this.friendDao.findFriendById(id);
+		// final Friend friend = this.friendDao.findFriendById(id);
+
+		final Friend friend = this.friendDao.findById(id);
 		return new ResponseEntity<>(friend, HttpStatus.OK);
 	}
 
 	@PostMapping
 	public ResponseEntity<?> insertFriend(@RequestBody final Friend friend) {
-		return new ResponseEntity<>(this.friendDao.insertFriend(friend), HttpStatus.CREATED);
+		// return new ResponseEntity<>(this.friendDao.insertFriend(friend),
+		// HttpStatus.CREATED);
+		return new ResponseEntity<>(this.friendDao.save(friend), HttpStatus.CREATED);
 	}
 
 	@PutMapping
 	public ResponseEntity<?> updateFriend(@RequestBody final Friend friend) {
-		this.friendDao.findFriendById(friend.getId());
-		return new ResponseEntity<>(this.friendDao.updateFriend(friend), HttpStatus.OK);
+		// this.friendDao.findFriendById(friend.getId());
+		// return new ResponseEntity<>(this.friendDao.updateFriend(friend),
+		// HttpStatus.OK);
+		//
+		this.friendDao.findById(friend.getId());
+		return new ResponseEntity<>(this.friendDao.update(friend), HttpStatus.OK);
 	}
 
 	@DeleteMapping(path = "{id}")
 	public ResponseEntity<?> deleteFriend(@PathVariable("id") final Long id) {
-		this.friendDao.findFriendById(id);
-		this.friendDao.deleteFriend(id);
+		// this.friendDao.findFriendById(id);
+		// this.friendDao.deleteFriend(id);
+
+		Friend entity = this.friendDao.findById(id);
+		this.friendDao.delete(entity);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
