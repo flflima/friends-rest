@@ -29,13 +29,15 @@ public class Address implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(length = 20)
 	private String location;
 
-	@NotNull
-	@Column(name = "street_name")
+	@NotNull(message = "Field 'streetName' is required")
+	@Column(name = "street_name", length = 20)
 	private String streetName;
 
-	@NotNull
+	@NotNull(message = "Field 'city' is required")
+	@Column(length = 50)
 	private String city;
 
 	@ManyToOne
