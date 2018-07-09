@@ -4,41 +4,4 @@
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
 	version="3.1">
 	<display-name>friends-rest</display-name>
-
-	<context-param>
-		<param-name>contextClass</param-name>
-		<param-value>
-			org.springframework.web.context.support.AnnotationConfigWebApplicationContext
-		</param-value>
-	</context-param>
-<!-- 
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>br.com.dev.friends</param-value>
-	</context-param> -->
-
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-	</listener>
-
-	<servlet>
-		<servlet-name>rest-server</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<init-param>
-			<param-name>contextClass</param-name>
-			<param-value>
-				org.springframework.web.context.support.AnnotationConfigWebApplicationContext
-			</param-value>
-		</init-param>
-		<init-param>
-			<param-name>contextConfigLocation</param-name>
-			<param-value>br.com.dev.friends</param-value>
-		</init-param>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>rest-server</servlet-name>
-		<url-pattern>/api/*</url-pattern>
-	</servlet-mapping>
 </web-app>
