@@ -17,6 +17,6 @@ public class FriendDaoImpl extends BaseDAOImpl<Friend> implements FriendDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Friend> findAll() {
-		return this.entityManager.createNamedQuery(Friend.NQ_FIND_ALL).setMaxResults(10).getResultList();
+		return this.entityManager.createNamedQuery(Friend.NQ_FIND_ALL).getResultList();
 	}
 }

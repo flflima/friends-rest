@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.dev.friends.dao.AddressDao;
 import br.com.dev.friends.dao.FriendDao;
+import br.com.dev.friends.exception.ResourceNotFoundException;
+import br.com.dev.friends.model.Address;
 import br.com.dev.friends.model.Friend;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -32,16 +35,24 @@ public class FriendController implements Serializable {
 	@Autowired
 	private FriendDao friendDao;
 
+	@Autowired
+	private AddressDao addressDao;
+
 	@GetMapping
 	public ResponseEntity<?> getAllFriends() {
-		final List<Friend> listAllFriends = this.friendDao.findAll();
-		return new ResponseEntity<>(listAllFriends, HttpStatus.OK);
+		return new ResponseEntity<>(this.friendDao.findAll(), HttpStatus.OK);
 	}
 
 	@GetMapping(path = "{id}")
 	public ResponseEntity<?> getFriendById(@PathVariable("id") final Long id) {
-		final Friend friend = this.friendDao.findById(id);
-		return new ResponseEntity<>(friend, HttpStatus.OK);
+		return new ResponseEntity<>(this.friendDao.findById(id), HttpStatus.OK);
+	}
+
+	@GetMapping(path = "{id}/addresses")
+	public ResponseEntity<?> getAddressesByFriendById(@PathVariable("id") final Long id) {
+		// get all addresses associated to this friend id
+		final List<Address> addresses = this.addressDao.findAddressesByFriendById(id);
+		return new ResponseEntity<>(addresses, HttpStatus.OK);
 	}
 
 	@PostMapping
@@ -50,22 +61,35 @@ public class FriendController implements Serializable {
 	}
 
 	@PutMapping
-	public ResponseEntity<?> updateFriend(@RequestBody final Friend friend) {
+	public ResponseEntity<?> updateFriend(@RequestBody final Friend friend) throws ResourceNotFoundException {
+		// verify if exists in db
 		final Friend oldFriend = this.friendDao.findById(friend.getId());
 
 		if (oldFriend == null) {
-			throw new RuntimeException("Friend not found: " + friend);
+			throw new ResourceNotFoundException("Friend not found: " + friend);
 		}
 
 		friend.setId(oldFriend.getId());
-
 		return new ResponseEntity<>(this.friendDao.update(friend), HttpStatus.OK);
 	}
 
 	@DeleteMapping(path = "{id}")
 	public ResponseEntity<?> deleteFriend(@PathVariable("id") final Long id) {
-		final Friend entity = this.friendDao.findById(id);
-		this.friendDao.delete(entity);
+		// remove all associated addresses, if exist any
+		final List<Address> addresses = this.addressDao.findAddressesByFriendById(id);
+
+		for (Address address : addresses) {
+			this.addressDao.delete(address);
+		}
+
+		// get friend entity
+		final Friend friendEntity = this.friendDao.findById(id);
+
+		if (friendEntity == null) {
+			throw new RuntimeException("Friend not found for id: " + id);
+		}
+
+		this.friendDao.delete(friendEntity);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }

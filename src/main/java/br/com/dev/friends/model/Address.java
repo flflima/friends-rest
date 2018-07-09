@@ -9,18 +9,24 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.validation.constraints.NotNull;
 
 @Entity
+@NamedQueries({
+		@NamedQuery(name = Address.NQ_FIND_ADDRESS_BY_ID, query = "select a from Address a where a.friend.id = :id order by a.streetName") })
 public class Address implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6095417136454034512L;
-	
+
+	public static final String NQ_FIND_ADDRESS_BY_ID = "findAddressById";
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	private String location;
@@ -33,8 +39,8 @@ public class Address implements Serializable {
 	private String city;
 
 	@ManyToOne
-    @JoinColumn(name = "friend_id")
-    private Friend friend;
+	@JoinColumn(name = "friend_id", referencedColumnName = "id")
+	private Friend friend;
 
 	public Long getId() {
 		return id;
