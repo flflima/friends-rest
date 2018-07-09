@@ -1,12 +1,14 @@
 package br.com.dev.friends.model;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.validation.constraints.NotNull;
@@ -32,6 +34,10 @@ public class Friend implements Serializable {
 
 	private int age;
 
+	@Column
+	@Lob
+	private byte[] image;
+
 	public Long getId() {
 		return id;
 	}
@@ -56,9 +62,17 @@ public class Friend implements Serializable {
 		this.age = age;
 	}
 
+	public byte[] getImage() {
+		return image;
+	}
+
+	public void setImage(byte[] image) {
+		this.image = image;
+	}
+
 	@Override
 	public String toString() {
-		return "Friend [id=" + id + ", name=" + name + ", age=" + age + "]";
+		return "Friend [id=" + id + ", name=" + name + ", age=" + age + ", image=" + Arrays.toString(image) + "]";
 	}
 
 }

@@ -1,11 +1,13 @@
 package br.com.dev.friends.resource;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +16,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.com.dev.friends.dao.AddressDao;
 import br.com.dev.friends.dao.FriendDao;
@@ -56,11 +60,13 @@ public class FriendController implements Serializable {
 	}
 
 	@PostMapping
+	@Transactional(rollbackFor = Exception.class)
 	public ResponseEntity<?> insertFriend(@RequestBody final Friend friend) {
 		return new ResponseEntity<>(this.friendDao.save(friend), HttpStatus.CREATED);
 	}
 
 	@PutMapping
+	@Transactional(rollbackFor = Exception.class)
 	public ResponseEntity<?> updateFriend(@RequestBody final Friend friend) throws ResourceNotFoundException {
 		// verify if exists in db
 		final Friend oldFriend = this.friendDao.findById(friend.getId());
@@ -74,6 +80,7 @@ public class FriendController implements Serializable {
 	}
 
 	@DeleteMapping(path = "{id}")
+	@Transactional(rollbackFor = Exception.class)
 	public ResponseEntity<?> deleteFriend(@PathVariable("id") final Long id) {
 		// remove all associated addresses, if exist any
 		final List<Address> addresses = this.addressDao.findAddressesByFriendById(id);
@@ -91,5 +98,26 @@ public class FriendController implements Serializable {
 
 		this.friendDao.delete(friendEntity);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@PutMapping(path = "{id}/image")
+	@Transactional(rollbackFor = Exception.class)
+	public ResponseEntity<?> saveImage(@PathVariable("id") final Long id,
+			@RequestParam("image") final MultipartFile file) {
+		try {
+			// get friend entity
+			final Friend friendEntity = this.friendDao.findById(id);
+
+			if (friendEntity == null) {
+				throw new RuntimeException("Friend not found for id: " + id);
+			}
+
+			// set uploaded image
+			friendEntity.setImage(file.getBytes());
+			return new ResponseEntity<>(this.friendDao.update(friendEntity), HttpStatus.CREATED);
+		} catch (IOException e) {
+
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
