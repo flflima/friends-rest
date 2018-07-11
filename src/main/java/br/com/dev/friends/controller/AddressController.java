@@ -1,8 +1,9 @@
-package br.com.dev.friends.resource;
+package br.com.dev.friends.controller;
 
 import java.io.Serializable;
-import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.dev.friends.dao.AddressDao;
 import br.com.dev.friends.exception.ResourceNotFoundException;
 import br.com.dev.friends.model.Address;
+import br.com.dev.friends.service.AddressService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -30,46 +31,44 @@ public class AddressController implements Serializable {
 	 */
 	private static final long serialVersionUID = 8416187518009536265L;
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(AddressController.class);
+
 	@Autowired
-	private AddressDao addressDao;
+	private AddressService addressService;
 
 	@GetMapping
 	public ResponseEntity<?> getAllAddresses() {
-		final List<Address> listAllAddresses = this.addressDao.findAll();
-		return new ResponseEntity<>(listAllAddresses, HttpStatus.OK);
+		LOGGER.info("Finding all addresses");
+
+		return new ResponseEntity<>(this.addressService.findAllAddresses(), HttpStatus.OK);
 	}
 
 	@GetMapping(path = "{id}")
-	public ResponseEntity<?> getAddressById(@PathVariable("id") final Long id) {
-		final Address address = this.addressDao.findById(id);
-		return new ResponseEntity<>(address, HttpStatus.OK);
+	public ResponseEntity<?> getAddressById(@PathVariable("id") final Long id) throws ResourceNotFoundException {
+		LOGGER.info("Finding address for id [{}]", id);
+
+		return new ResponseEntity<>(this.addressService.findAddressById(id), HttpStatus.OK);
 	}
 
 	@PostMapping
 	public ResponseEntity<?> insertAddress(@RequestBody final Address address) {
-		return new ResponseEntity<>(this.addressDao.save(address), HttpStatus.CREATED);
+		LOGGER.info("Saving an address: [{}]", address);
+
+		return new ResponseEntity<>(this.addressService.saveAddress(address), HttpStatus.CREATED);
 	}
 
 	@PutMapping
-	public ResponseEntity<?> updateAddress(@RequestBody Address address) {
-		final Address entity = this.addressDao.findById(address.getId());
+	public ResponseEntity<?> updateAddress(@RequestBody final Address address) throws ResourceNotFoundException {
+		LOGGER.info("Updating an address: [{}]", address);
 
-		if (entity == null) {
-			throw new RuntimeException("Friend not found: " + entity);
-		}
-
-		return new ResponseEntity<>(this.addressDao.update(address), HttpStatus.OK);
+		return new ResponseEntity<>(this.addressService.updateAddress(address), HttpStatus.OK);
 	}
 
 	@DeleteMapping(path = "{id}")
 	public ResponseEntity<?> deleteAddress(@PathVariable("id") final Long id) throws ResourceNotFoundException {
-		final Address entity = this.addressDao.findById(id);
+		LOGGER.info("Deleting address for id [{}]", id);
 
-		if (entity == null) {
-			throw new ResourceNotFoundException("Address not found for id: " + id);
-		}
-
-		this.addressDao.delete(entity);
+		this.addressService.deleteAddressById(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
