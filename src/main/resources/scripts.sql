@@ -3,7 +3,7 @@ create table friend (
 	id bigint NOT NULL AUTO_INCREMENT,
 	name varchar(100) NOT NULL,
 	age integer,
-	image blob;
+	image blob,
 	primary key(id)
 );
 
