@@ -9,7 +9,7 @@
 	<name>Friends List</name>
 
 	<properties>
-		<spring.version>5.0.6.RELEASE</spring.version>
+		<spring.version>5.2.3.RELEASE</spring.version>
 		<javax.servlet.version>4.0.1</javax.servlet.version>
 		<validation.api.version>2.0.1.Final</validation.api.version>
 		<slf4j.version>1.7.25</slf4j.version>
