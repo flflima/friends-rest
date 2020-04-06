@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.dev.friends.dao.AddressDao;
-import br.com.dev.friends.dao.FriendDao;
+import br.com.dev.friends.dao.AddressDAO;
+import br.com.dev.friends.dao.FriendDAO;
 import br.com.dev.friends.exception.FileImageOperationException;
 import br.com.dev.friends.exception.ResourceNotFoundException;
 import br.com.dev.friends.model.Address;
@@ -29,10 +29,13 @@ public class FriendService implements Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FriendService.class);
 
 	@Autowired
-	private FriendDao friendDao;
+	public FriendService(FriendDAO friendDao, AddressDAO addressDao) {
+		this.friendDao = friendDao;
+		this.addressDao = addressDao;
+	}
 
-	@Autowired
-	private AddressDao addressDao;
+	private FriendDAO friendDao;
+	private AddressDAO addressDao;
 
 	public List<Friend> findAllFriends() {
 		final List<Friend> friends = this.friendDao.findAll();

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.dev.friends.dao.AddressDao;
+import br.com.dev.friends.dao.AddressDAO;
 import br.com.dev.friends.exception.ResourceNotFoundException;
 import br.com.dev.friends.model.Address;
 
@@ -24,7 +24,7 @@ public class AddressService implements Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AddressService.class);
 
 	@Autowired
-	private AddressDao addressDao;
+	private AddressDAO addressDao;
 
 	public List<Address> findAllAddresses() {
 		final List<Address> addresses = this.addressDao.findAll();

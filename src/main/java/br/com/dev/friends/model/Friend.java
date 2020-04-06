@@ -24,6 +24,15 @@ public class Friend implements Serializable {
 
 	public static final String NQ_FIND_ALL = "findAll";
 
+	public Friend() {
+	}
+
+	public Friend(Long id, String name, int age) {
+		this.id = id;
+		this.name = name;
+		this.age = age;
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
