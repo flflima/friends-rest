@@ -31,6 +31,13 @@ jacocoTestReport {
         csv.enabled false
         html.destination file("${buildDir}/jacocoHtml")
     }
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    'br/com/dev/friends/model/**'
+            ])
+        })
+    }
 }
 
 jacocoTestCoverageVerification {
@@ -77,3 +84,6 @@ sourceCompatibility = '1.8'
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
+
+test.finalizedBy jacocoTestReport
+check.dependsOn jacocoTestCoverageVerification
