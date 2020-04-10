@@ -89,4 +89,15 @@ public final class FriendServiceTest {
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Friend not found for id 1");
     }
+
+    @Test
+    void mustExecuteInsertInDBWhenSaveMethodIsCalled() {
+        final Friend friend = mock(Friend.class);
+        final FriendDAO friendDAO = mock(FriendDAO.class);
+        doAnswer(invocation -> friend).when(friendDAO).save(any());
+
+        final FriendService friendService = new FriendService(friendDAO, mock(AddressDAO.class));
+        friendService.saveFriend(friend);
+        verify(friendDAO, times(1)).save(friend);
+    }
 }
