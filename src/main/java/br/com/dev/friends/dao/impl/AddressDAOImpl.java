@@ -4,13 +4,13 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import br.com.dev.friends.dao.AddressDao;
+import br.com.dev.friends.dao.AddressDAO;
 import br.com.dev.friends.model.Address;
 
 @Component("addressDao")
-public class AddressDaoImpl extends BaseDAOImpl<Address> implements AddressDao {
+public class AddressDAOImpl extends BaseDAOImpl<Address> implements AddressDAO {
 
-	public AddressDaoImpl() {
+	public AddressDAOImpl() {
 		super(Address.class);
 	}
 

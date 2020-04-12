@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.dev.friends.dao.AddressDao;
-import br.com.dev.friends.dao.FriendDao;
+import br.com.dev.friends.dao.AddressDAO;
+import br.com.dev.friends.dao.FriendDAO;
 import br.com.dev.friends.exception.FileImageOperationException;
 import br.com.dev.friends.exception.ResourceNotFoundException;
 import br.com.dev.friends.model.Address;
@@ -29,10 +29,13 @@ public class FriendService implements Serializable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FriendService.class);
 
 	@Autowired
-	private FriendDao friendDao;
+	public FriendService(FriendDAO friendDao, AddressDAO addressDao) {
+		this.friendDao = friendDao;
+		this.addressDao = addressDao;
+	}
 
-	@Autowired
-	private AddressDao addressDao;
+	private FriendDAO friendDao;
+	private AddressDAO addressDao;
 
 	public List<Friend> findAllFriends() {
 		final List<Friend> friends = this.friendDao.findAll();
@@ -55,17 +58,6 @@ public class FriendService implements Serializable {
 		return friend;
 	}
 
-	public List<Address> findAddressesByFriendId(final Long id) {
-		// get all addresses associated to this friend id
-		final List<Address> addresses = this.addressDao.findAddressesByFriendById(id);
-
-		if (addresses.size() == 0) {
-			LOGGER.debug("No address found for friend with id [{}]", id);
-		}
-
-		return addresses;
-	}
-
 	@Transactional(rollbackFor = Exception.class)
 	public Friend saveFriend(final Friend friend) {
 		return this.friendDao.save(friend);
@@ -73,7 +65,6 @@ public class FriendService implements Serializable {
 
 	@Transactional(rollbackFor = Exception.class)
 	public Friend updateFriend(final Friend friend) throws ResourceNotFoundException {
-		// verify if exists in db
 		final Friend oldFriend = this.friendDao.findById(friend.getId());
 
 		if (oldFriend == null) {
@@ -83,26 +74,6 @@ public class FriendService implements Serializable {
 
 		friend.setId(oldFriend.getId());
 		return this.friendDao.update(friend);
-	}
-
-	public Friend saveImageOnDatabase(final Long id, final MultipartFile file)
-			throws FileImageOperationException, ResourceNotFoundException {
-		try {
-			// get friend entity
-			final Friend friendEntity = this.friendDao.findById(id);
-
-			if (friendEntity == null) {
-				LOGGER.debug("Friend not found for id [{}]", id);
-				throw new ResourceNotFoundException("Friend not found for id: " + id);
-			}
-
-			// set uploaded image
-			friendEntity.setImage(file.getBytes());
-			return this.friendDao.update(friendEntity);
-		} catch (final IOException e) {
-			LOGGER.error("Error on processing file [{}]: [{}]", file.getOriginalFilename(), e.getMessage());
-			throw new FileImageOperationException(e.getMessage());
-		}
 	}
 
 	@Transactional(rollbackFor = Exception.class)
@@ -124,6 +95,37 @@ public class FriendService implements Serializable {
 		}
 
 		this.friendDao.delete(friendEntity);
+	}
+
+	public List<Address> findAddressesByFriendId(final Long id) {
+		// get all addresses associated to this friend id
+		final List<Address> addresses = this.addressDao.findAddressesByFriendById(id);
+
+		if (addresses.size() == 0) {
+			LOGGER.debug("No address found for friend with id [{}]", id);
+		}
+
+		return addresses;
+	}
+
+	public Friend saveImageOnDatabase(final Long id, final MultipartFile file)
+			throws FileImageOperationException, ResourceNotFoundException {
+		try {
+			// get friend entity
+			final Friend friendEntity = this.friendDao.findById(id);
+
+			if (friendEntity == null) {
+				LOGGER.debug("Friend not found for id [{}]", id);
+				throw new ResourceNotFoundException("Friend not found for id: " + id);
+			}
+
+			// set uploaded image
+			friendEntity.setImage(file.getBytes());
+			return this.friendDao.update(friendEntity);
+		} catch (final IOException e) {
+			LOGGER.error("Error on processing file [{}]: [{}]", file.getOriginalFilename(), e.getMessage());
+			throw new FileImageOperationException(e.getMessage());
+		}
 	}
 
 }
